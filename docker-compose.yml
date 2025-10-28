@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web2wallet:
+    build: .
+    ports:
+      - "42069:42069"
+    # Environment variables for the application
+    # Required for basic operation:
+    # SECRET_KEY: Cryptographically secure secret key for Flask sessions
+    # TCP_PORT: Port to run the application on (default: 42069)
+    #
+    # Optional security settings:
+    # API_KEYS: Comma-separated list of API keys for protecting endpoints
+    #
+    # OAuth Provider Settings (at least one provider must be configured):
+    # GOOGLE_CLIENT_ID: Google OAuth client ID
+    # GOOGLE_CLIENT_SECRET: Google OAuth client secret
+    # GOOGLE_REDIRECT_URI: Google OAuth redirect URI (e.g., http://localhost:42069/callback/google)
+    #
+    # Redirect URLs (optional but recommended):
+    # SUCCESS_REDIRECT_URL: URL to redirect to after successful authentication
+    # FAILURE_REDIRECT_URL: URL to redirect to after failed authentication
+    # LOGOUT_REDIRECT_URL: URL to redirect to after logout
+    #
+    # NMKR Settings (optional, for Cardano wallet creation):
+    # NMKR_API_KEY: API key for NMKR Studio
+    # NMKR_CUSTOMER_ID: Customer ID for NMKR Studio
+    #
+    # File Storage Settings (optional):
+    # WALLET_STORAGE_FILE: Path to wallet storage file (default: wallets.json)
+    environment:
+      - SECRET_KEY=your-secret-key-here
+      - TCP_PORT=42069
+    env_file:
+      - .env
+    volumes:
+      - ./wallets.json:/app/wallets.json
+      - ./wallets.json.lock:/app/wallets.json.lock
