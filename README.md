@@ -6,13 +6,13 @@ A robust, configurable Flask backend designed to provide seamless authentication
 
 ## Overview
 
-This application serves as a centralized authentication and wallet management service. A client application (like a game) can initiate an authentication flow by opening a browser window to this backend. The user logs in via a supported provider (Google). Upon the first successful login, the backend communicates with [NMKR Studio](https://nmkr.io/) to create a new managed Cardano wallet for that user, securely associating it with their account. On subsequent logins, it simply retrieves the user's existing wallet address.
+This application serves as a centralized authentication and wallet management service. A client application (like a game) can initiate an authentication flow by opening a browser window to this backend. The user logs in via a supported provider (Google, Discord, X/Twitter). Upon the first successful login, the backend communicates with [NMKR Studio](https://nmkr.io/) to create a new managed Cardano wallet for that user, securely associating it with their account. On subsequent logins, it simply retrieves the user's existing wallet address.
 
 The client application polls a status endpoint to know when the process is complete and to receive the user's details and wallet information.
 
 ## Features
 
--   **Google Authentication:** Out-of-the-box support for Google using OAuth 2.0.
+-   **Multi-Provider Authentication:** Out-of-the-box support for Google, Discord, and X/Twitter using OAuth 2.0.
 -   **Dynamic Provider Registration:** Automatically enables only the providers that are fully configured in the `.env` file.
 -   **On-the-Fly Wallet Creation:** Integrates with the NMKR Studio API to create a managed Cardano wallet for new users.
 -   **Persistent & Safe Wallet Association:** Securely links a user's OAuth identity to their Cardano wallet address using a simple JSON file. File-locking prevents data corruption during simultaneous sign-ups.
@@ -29,7 +29,7 @@ Follow these instructions to get your own instance of the backend running.
 
 ### Prerequisites
 
--   Python 3.8+
+-   Python 3.9+
 -   `pip` for package installation
 -   A text editor to create the `.env` file
 
@@ -37,8 +37,8 @@ Follow these instructions to get your own instance of the backend running.
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
-    cd <local-path>
+    git clone https://github.com/Odiobill/web2wallet.git
+    cd web2wallet
     ```
 
 2.  **Create a virtual environment (recommended):**
@@ -94,11 +94,23 @@ Create a `.env` file in the project's root directory. Use the following template
 #GOOGLE_CLIENT_SECRET=
 #GOOGLE_REDIRECT_URI=http://localhost:42069/callback/google
 
+# --- Discord OAuth Provider (Optional) ---
+#DISCORD_CLIENT_ID=
+#DISCORD_CLIENT_SECRET=
+#DISCORD_REDIRECT_URI=http://localhost:42069/callback/discord
+
+# --- X/Twitter OAuth Provider (Optional) ---
+#X_CLIENT_ID=
+#X_CLIENT_SECRET=
+#X_REDIRECT_URI=http://localhost:42069/callback/x
+
 # --- NMKR Studio Wallet Integration (Optional) ---
 #NMKR_API_KEY=
 #NMKR_CUSTOMER_ID=
 # (Optional) The filename for storing wallet associations. Defaults to "wallets.json".
 #WALLET_STORAGE_FILE=wallets.json
+# (Optional) A fixed password for all created wallets. If not set, the user's ID is used.
+#WALLET_PASSWORD=your-wallet-password
 ```
 
 ---
@@ -117,7 +129,25 @@ To get the necessary credentials, you must register your application on each pro
 6.  Under **Authorized redirect URIs**, add the URI for your backend. For local testing, this is `http://localhost:42069/callback/google`.
 7.  Click **Create**. You will be shown your **Client ID** and **Client Secret**. Copy these into your `.env` file.
 
+### Discord Setup
 
+1.  Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+2.  Click **New Application** and give it a name.
+3.  Navigate to the **OAuth2** tab from the left menu.
+4.  Under **Redirects**, add the URI for your backend. For local testing, this is `http://localhost:42069/callback/discord`.
+5.  Click **Save Changes**.
+6.  You can find your **Client ID** and **Client Secret** on this page. Use the "Reset Secret" button if needed. Copy these values into your `.env` file.
+
+### X/Twitter Setup
+
+1.  Go to the [X Developer Portal](https://developer.x.com/en/portal) and create a new Project and a new App within it.
+2.  In your App's settings, find and select **User authentication settings**.
+3.  Click **Set up**.
+4.  Enable **OAuth 2.0**.
+5.  For **Type of App**, select **Web App**.
+6.  In the **Callback URI / Redirect URL** field, add your backend's redirect URI: `http://localhost:42069/callback/x`.
+7.  Add a **Website URL** (e.g., `http://localhost:42069`).
+8.  Save the settings. You will be shown your **Client ID** and **Client Secret**. **Use these**, not the "API Key & Secret". Copy them into your `.env` file.
 
 ### NMKR Studio Setup
 
@@ -203,7 +233,7 @@ This is how your client application (or game) should interact with the backend.
 
 ## Production Deployment
 
-The built-in Flask development server (`app.run(debug=True)`) is not suitable for production use. It is not designed to be efficient, stable, or secure enough to handle real-world traffic. When deploying this application, use a production-ready WSGI server like **Gunicorn** or **uWSGI**.
+The built-in Flask development server (`app.run(debug=False)`) is not suitable for production use. It is not designed to be efficient, stable, or secure enough to handle real-world traffic. When deploying this application, use a production-ready WSGI server like **Gunicorn** or **uWSGI**.
 
 **Example with Gunicorn:**
 

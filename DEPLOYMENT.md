@@ -6,14 +6,14 @@ This guide provides detailed instructions for deploying the Web2Wallet applicati
 
 - Docker and Docker Compose installed
 - Python 3.9+ (if running without Docker)
-- Access to OAuth provider developer dashboards (Google)
+- Access to OAuth provider developer dashboards (Google, Discord, Twitter)
 - NMKR Studio account (optional, for Cardano wallet creation)
 
 ## Quick Start with Docker
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Odiobill/web2wallet.git
    cd web2wallet
    ```
 
@@ -24,16 +24,11 @@ This guide provides detailed instructions for deploying the Web2Wallet applicati
    docker-compose up -d
    ```
 
-4. Access the application at `http://localhost:42069`
+4. Access the application at `http://localhost:42069` (or a different port is configured accordingly)
 
 ## Environment Variables
 
 The application can be configured using environment variables. You can either set them in a `.env` file or directly in the docker-compose.yml.
-
-### Required Variables
-
-- `SECRET_KEY`: A cryptographically secure secret key for Flask sessions
-- `TCP_PORT`: Port to run the application on (default: 42069)
 
 ### Security Settings
 
@@ -48,7 +43,15 @@ At least one OAuth provider must be configured:
 - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
 - `GOOGLE_REDIRECT_URI`: Google OAuth redirect URI (e.g., http://localhost:42069/callback/google)
 
+#### Discord OAuth
+- `DISCORD_CLIENT_ID`: Discord OAuth client ID
+- `DISCORD_CLIENT_SECRET`: Discord OAuth client secret
+- `DISCORD_REDIRECT_URI`: Discord OAuth redirect URI (e.g., http://localhost:42069/callback/discord)
 
+#### X/Twitter OAuth
+- `X_CLIENT_ID`: X/Twitter OAuth client ID
+- `X_CLIENT_SECRET`: X/Twitter OAuth client secret
+- `X_REDIRECT_URI`: X/Twitter OAuth redirect URI (e.g., http://localhost:42069/callback/x)
 
 ### Redirect URLs
 
@@ -61,6 +64,7 @@ At least one OAuth provider must be configured:
 For Cardano wallet creation:
 - `NMKR_API_KEY`: API key for NMKR Studio
 - `NMKR_CUSTOMER_ID`: Customer ID for NMKR Studio
+- `WALLET_PASSWORD`: Optional password for created wallets
 
 ### File Storage Settings
 
@@ -80,6 +84,16 @@ GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_REDIRECT_URI=http://localhost:42069/callback/google
 
+# Discord OAuth settings (optional)
+DISCORD_CLIENT_ID=your-discord-client-id
+DISCORD_CLIENT_SECRET=your-discord-client-secret
+DISCORD_REDIRECT_URI=http://localhost:42069/callback/discord
+
+# X/Twitter OAuth settings (optional)
+X_CLIENT_ID=your-x-client-id
+X_CLIENT_SECRET=your-x-client-secret
+X_REDIRECT_URI=http://localhost:42069/callback/x
+
 # Redirect URLs (optional)
 SUCCESS_REDIRECT_URL=https://your-frontend-app.com/login-success
 FAILURE_REDIRECT_URL=https://your-frontend-app.com/login-failure
@@ -88,6 +102,7 @@ LOGOUT_REDIRECT_URL=https://your-frontend-app.com/logout
 # NMKR settings (optional)
 NMKR_API_KEY=your-nmkr-api-key
 NMKR_CUSTOMER_ID=your-nmkr-customer-id
+WALLET_PASSWORD=your-wallet-password
 ```
 
 ## Production Deployment
